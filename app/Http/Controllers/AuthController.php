@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
@@ -19,9 +20,16 @@ class AuthController extends Controller
             'role_id' => ['required', 'integer', 'exists:roles,role_id'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'min:8'],
+            'profile_picture' => ['nullable', 'image', 'max:2048'],
         ]);
 
+        $profilePath = null;
+        if ($request->hasFile('profile_picture')) {
+            $profilePath = $request->file('profile_picture')->store('profile_pictures', 'public');
+        }
+
         $user = User::create([
+            'name' => $validated['first_name'].' '.$validated['last_name'],
             'first_name' => $validated['first_name'],
             'last_name' => $validated['last_name'],
             'address' => $validated['address'],
@@ -29,6 +37,8 @@ class AuthController extends Controller
             'role_id' => $validated['role_id'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
+            'is_deleted' => false,
+            'profile_picture' => $profilePath,
         ]);
 
         $token = $user->createToken('auth_token')->plainTextToken;
@@ -42,6 +52,7 @@ class AuthController extends Controller
                 'email' => $user->email,
                 'address' => $user->address,
                 'phone' => $user->phone,
+                'profile_picture_url' => $user->profile_picture ? \Illuminate\Support\Facades\Storage::url($user->profile_picture) : null,
                 'role' => [
                     'role_id' => optional($user->role)->role_id,
                     'name' => optional($user->role)->name,
@@ -97,6 +108,28 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'Logout successful',
+        ]);
+    }
+
+    public function me(Request $request)
+    {
+        $user = $request->user();
+
+        return response()->json([
+            'message' => 'Me fetched successfully',
+            'user' => [
+                'id' => $user->id,
+                'first_name' => $user->first_name,
+                'last_name' => $user->last_name,
+                'email' => $user->email,
+                'address' => $user->address,
+                'phone' => $user->phone,
+                'profile_picture_url' => $user->profile_picture ? url(Storage::url($user->profile_picture)) : null,
+                'role' => [
+                    'role_id' => optional($user->role)->role_id,
+                    'name' => optional($user->role)->name,
+                ],
+            ],
         ]);
     }
 }
