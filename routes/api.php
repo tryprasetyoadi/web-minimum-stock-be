@@ -7,6 +7,8 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\JenisController;
 use App\Http\Controllers\MerkController;
 use App\Http\Controllers\ShipmentController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\ActivityLogController;
 
 Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
@@ -55,6 +57,20 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/shipments', [ShipmentController::class, 'store']);
     Route::match(['put','patch'], '/shipments/{shipment}', [ShipmentController::class, 'update']);
     Route::delete('/shipments/{shipment}', [ShipmentController::class, 'destroy']);
+
+    // Shipment messages endpoints
+    Route::get('/shipments/{shipment}/messages', [\App\Http\Controllers\ShipmentMessageController::class, 'index']);
+    Route::post('/shipments/{shipment}/messages', [\App\Http\Controllers\ShipmentMessageController::class, 'store']);
+    Route::post('/shipments/{shipment}/messages/read', [\App\Http\Controllers\ShipmentMessageController::class, 'markRead']);
+    Route::get('/shipments/{shipment}/messages/stream', [\App\Http\Controllers\ShipmentMessageController::class, 'stream']);
+
+    // Reports summary must be above resource to avoid route-model-binding catching 'summary'
+    Route::get('/reports/summary', [ReportController::class, 'summary']);
+    // Reports CRUD endpoints (index supports filter by jenis)
+    Route::apiResource('/reports', ReportController::class);
+
+    // Activity Logs endpoints
+    Route::apiResource('/activity-logs', ActivityLogController::class);
 
     // Chat endpoints
     Route::get('/conversations', [\App\Http\Controllers\ConversationController::class, 'index']);

@@ -10,6 +10,8 @@ use Database\Seeders\UserSeeder;
 use Database\Seeders\JenisSeeder;
 use Database\Seeders\MerkSeeder;
 use Database\Seeders\ShipmentSeeder;
+use Database\Seeders\ReportSeeder;
+use Database\Seeders\ActivityLogSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -24,6 +26,8 @@ class DatabaseSeeder extends Seeder
             JenisSeeder::class,
             MerkSeeder::class,
             ShipmentSeeder::class,
+            ReportSeeder::class,
+            ActivityLogSeeder::class,
         ]);
     }
 }
