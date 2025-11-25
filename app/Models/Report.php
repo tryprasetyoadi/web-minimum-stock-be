@@ -22,6 +22,7 @@ class Report extends Model
         'tanggal_pengiriman',
         'tanggal_sampai',
         'batch',
+        'sn_mac_picture',
     ];
 
     protected $casts = [

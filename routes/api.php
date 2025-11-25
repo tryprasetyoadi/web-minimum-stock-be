@@ -9,6 +9,7 @@ use App\Http\Controllers\MerkController;
 use App\Http\Controllers\ShipmentController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ActivityLogController;
+use App\Http\Controllers\MessagesController;
 
 Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
@@ -71,6 +72,15 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Activity Logs endpoints
     Route::apiResource('/activity-logs', ActivityLogController::class);
+
+    // Notification Messages API
+    Route::get('/messages', [MessagesController::class, 'index']);
+    Route::post('/messages', [MessagesController::class, 'store']);
+    Route::get('/messages/conversations', [MessagesController::class, 'conversations']);
+    Route::get('/messages/conversations/{partner_id}/messages', [MessagesController::class, 'conversationMessages']);
+    Route::post('/messages/{id}/read', [MessagesController::class, 'markRead']);
+    Route::get('/messages/unread-count', [MessagesController::class, 'unreadCount']);
+    Route::get('/messages/updates', [MessagesController::class, 'updates']);
 
     // Chat endpoints
     Route::get('/conversations', [\App\Http\Controllers\ConversationController::class, 'index']);

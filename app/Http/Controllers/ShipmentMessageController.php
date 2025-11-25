@@ -14,12 +14,13 @@ class ShipmentMessageController extends Controller
     private function ensureAuthorized(Shipment $shipment): void
     {
         $userId = Auth::id();
-        $isRelated = ($shipment->pic_user_id === $userId) || ($shipment->approved_by_user_id === $userId);
+        $isRelated = ($shipment->pic_user_id === $userId) || ($shipment->approved_by_user_id === $userId) || Auth::user()->role_id == 1;
 
         if (! $isRelated) {
             abort(403, 'You are not authorized to access messages for this shipment');
         }
     }
+
 
     public function index(Request $request, Shipment $shipment)
     {

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Report;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Storage;
 
 class ReportController extends Controller
 {
@@ -117,10 +118,16 @@ class ReportController extends Controller
             'items.*.tanggal_pengiriman' => 'nullable|date',
             'items.*.tanggal_sampai' => 'nullable|date',
             'items.*.batch' => 'nullable|string',
+            'items.*.sn_mac_picture' => 'nullable|image|max:5120',
         ]);
 
         $created = [];
-        foreach ($validated['items'] as $item) {
+        foreach ($validated['items'] as $i => $item) {
+            $path = null;
+            $file = $request->file("items.$i.sn_mac_picture");
+            if ($file) {
+                $path = $file->store('sn_mac_pictures', 'public');
+            }
             $created[] = Report::create([
                 'jenis' => $validated['jenis'],
                 'type' => $item['type'],
@@ -134,6 +141,7 @@ class ReportController extends Controller
                 'tanggal_pengiriman' => $item['tanggal_pengiriman'] ?? null,
                 'tanggal_sampai' => $item['tanggal_sampai'] ?? null,
                 'batch' => $item['batch'] ?? null,
+                'sn_mac_picture' => $path,
             ]);
         }
 
@@ -169,7 +177,14 @@ class ReportController extends Controller
             'tanggal_pengiriman' => 'nullable|date',
             'tanggal_sampai' => 'nullable|date',
             'batch' => 'nullable|string',
+            'sn_mac_picture' => 'nullable|image|max:5120',
         ]);
+
+        if ($request->hasFile('sn_mac_picture')) {
+            $file = $request->file('sn_mac_picture');
+            $path = $file->store('sn_mac_pictures', 'public');
+            $validated['sn_mac_picture'] = $path;
+        }
 
         $report->fill($validated);
         $report->save();
