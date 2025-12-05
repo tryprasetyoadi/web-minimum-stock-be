@@ -10,6 +10,7 @@ use App\Http\Controllers\ShipmentController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\MessagesController;
+use App\Http\Controllers\WarehouseController;
 
 Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
@@ -87,4 +88,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/conversations', [\App\Http\Controllers\ConversationController::class, 'store']);
     Route::get('/conversations/{conversation}/messages', [\App\Http\Controllers\ConversationController::class, 'messages']);
     Route::post('/conversations/{conversation}/messages', [\App\Http\Controllers\ConversationController::class, 'send']);
+
+    // Warehouse TA CCAN options
+    Route::get('/warehouses/{warehouse}/ta-ccan', [WarehouseController::class, 'taCcanOptions']);
+    Route::get('/warehouses/ta-ccan', [WarehouseController::class, 'taCcanOptions']);
 });

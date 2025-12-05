@@ -18,6 +18,18 @@ class ReportController extends Controller
         if ($request->filled('jenis')) {
             $query->where('jenis', $request->query('jenis'));
         }
+        $keyword = $request->query('keyword');
+        if ($keyword !== null && $keyword !== '') {
+            $t = $keyword;
+            $query->where(function ($q) use ($t) {
+                $q->where('type', 'like', "%$t%")
+                    ->orWhere('warehouse', 'like', "%$t%")
+                    ->orWhere('receiver_warehouse', 'like', "%$t%")
+                    ->orWhere('sender_pic', 'like', "%$t%")
+                    ->orWhere('receiver_pic', 'like', "%$t%")
+                    ->orWhere('batch', 'like', "%$t%");
+            });
+        }
 
         $reports = $query->latest()->paginate($request->integer('per_page', 15));
         return response()->json($reports);

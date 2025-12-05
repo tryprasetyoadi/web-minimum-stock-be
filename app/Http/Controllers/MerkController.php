@@ -16,6 +16,11 @@ class MerkController extends Controller
             $query->where('jenis_id', (int) $request->query('jenis_id'));
         }
 
+        $keyword = $request->query('keyword');
+        if ($keyword !== null && $keyword !== '') {
+            $query->where('name', 'like', "%$keyword%");
+        }
+
         $list = $query->get(['id', 'name', 'jenis_id']);
 
         $data = $list->map(function ($merk) {

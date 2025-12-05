@@ -21,6 +21,17 @@ class UserController extends Controller
             $query->where('is_deleted', false);
         }
 
+        $keyword = $request->query('keyword');
+        if ($keyword !== null && $keyword !== '') {
+            $t = $keyword;
+            $query->where(function ($q) use ($t) {
+                $q->where('name', 'like', "%$t%")
+                    ->orWhere('email', 'like', "%$t%")
+                    ->orWhere('phone', 'like', "%$t%")
+                    ->orWhere('address', 'like', "%$t%");
+            });
+        }
+
         $paginator = $query
             ->orderBy('id', 'desc')
             ->paginate($perPage, [

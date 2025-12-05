@@ -26,9 +26,18 @@ class ShipmentController extends Controller
         if ($request->filled('delivery_by')) {
             $query->where('delivery_by', $request->query('delivery_by'));
         }
-        if ($request->filled('search')) {
-            $search = $request->query('search');
-            $query->where('type', 'like', "%$search%");
+        $keyword = $request->query('keyword');
+        $search = $request->query('search');
+        $term = $keyword ?? $search;
+        if ($term !== null && $term !== '') {
+            $query->where(function ($q) use ($term) {
+                $q->where('type', 'like', "%$term%")
+                    ->orWhere('jenis', 'like', "%$term%")
+                    ->orWhere('merk', 'like', "%$term%")
+                    ->orWhere('alamat_tujuan', 'like', "%$term%")
+                    ->orWhere('status', 'like', "%$term%")
+                    ->orWhere('delivery_by', 'like', "%$term%");
+            });
         }
 
         $paginator = $query->paginate($perPage);

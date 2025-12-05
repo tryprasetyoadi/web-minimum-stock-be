@@ -10,8 +10,12 @@ class JenisController extends Controller
 {
     public function index(Request $request)
     {
-        $list = Jenis::orderBy('name')
-            ->get(['id', 'name']);
+        $query = Jenis::orderBy('name');
+        $keyword = $request->query('keyword');
+        if ($keyword !== null && $keyword !== '') {
+            $query->where('name', 'like', "%$keyword%");
+        }
+        $list = $query->get(['id', 'name']);
 
         return response()->json([
             'message' => 'Jenis fetched successfully',
